@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    discovery:
+      enabled: false
+  main:
+    web-application-type: reactive
+
+eureka:
+  client:
+    enabled: false
