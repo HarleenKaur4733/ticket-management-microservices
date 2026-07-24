@@ -8,7 +8,7 @@ public interface UserService {
 
     UserResponse register(RegisterRequest request);
 
-    User getUserById(Long id);
+    UserResponse getUserById(Long id);
 
     User getUserByEmail(String email);
 

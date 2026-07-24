@@ -37,10 +37,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long id) {
-        // Implementation to retrieve user by ID
-        return userRepository.findById(id)
+    public UserResponse getUserById(Long id) {
+
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return userMapper.toResponse(user);
     }
 
     @Override
