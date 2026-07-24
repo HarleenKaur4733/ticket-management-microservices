@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.ticket_service.client.UserClient;
+import com.ticket_service.client.enums.UserResponse;
 import com.ticket_service.exception.ResourceNotFoundException;
 import com.ticket_service.ticket.dto.CreateTicketRequest;
 import com.ticket_service.ticket.dto.TicketDashboardResponse;
@@ -27,6 +29,7 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
     private final TicketMapper ticketMapper;
+    private final UserClient userClient;
 
     @Override
     public TicketResponse createTicket(CreateTicketRequest request) {
@@ -39,7 +42,10 @@ public class TicketServiceImpl implements TicketService {
         // TODO: Get from JWT later
         ticket.setCreatedByUserId(null);
 
-        ticket.setAssignedToUserId(request.getAssignedToUserId());
+        // validate assignedToUserId by calling user-service if it exists
+        UserResponse assignedUser = userClient.getUserById(request.getAssignedToUserId());
+
+        ticket.setAssignedToUserId(assignedUser.getId());
 
         Ticket savedTicket = ticketRepository.save(ticket);
 
