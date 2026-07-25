@@ -31,6 +31,13 @@ public class TicketServiceImpl implements TicketService {
     private final TicketMapper ticketMapper;
     private final UserClient userClient;
 
+    private void validateAssignedUser(Long userId) {
+
+        if (userId != null) {
+            userClient.getUserById(userId);
+        }
+    }
+
     @Override
     public TicketResponse createTicket(CreateTicketRequest request) {
 
@@ -43,9 +50,10 @@ public class TicketServiceImpl implements TicketService {
         ticket.setCreatedByUserId(null);
 
         // validate assignedToUserId by calling user-service if it exists
-        UserResponse assignedUser = userClient.getUserById(request.getAssignedToUserId());
+        // Validate that assigned user exists
+        validateAssignedUser(request.getAssignedToUserId());
 
-        ticket.setAssignedToUserId(assignedUser.getId());
+        ticket.setAssignedToUserId(request.getAssignedToUserId());
 
         Ticket savedTicket = ticketRepository.save(ticket);
 
@@ -83,6 +91,9 @@ public class TicketServiceImpl implements TicketService {
             ticket.setStatus(request.getStatus());
         }
         if (request.getAssignedToUserId() != null) {
+
+            validateAssignedUser(request.getAssignedToUserId());
+
             ticket.setAssignedToUserId(
                     request.getAssignedToUserId());
         }
