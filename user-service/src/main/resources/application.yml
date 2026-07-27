@@ -31,3 +31,7 @@ routes:
       - Path=/api/users/**
     filters:
       - RewritePath=/api/users/(?<segment>.*), /users/${segment}
+
+jwt:
+  secret: your-very-long-secret-key-at-least-32-characters-long
+  expiration: 86400000
