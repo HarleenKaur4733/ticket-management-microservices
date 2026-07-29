@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,10 +32,10 @@ public class TicketController {
         private final TicketService ticketService;
 
         @PostMapping
-        public ResponseEntity<TicketResponse> createTicket(
+        public ResponseEntity<TicketResponse> createTicket(@RequestHeader("X-User-Id") Long userId,
                         @RequestBody CreateTicketRequest request) {
 
-                TicketResponse response = ticketService.createTicket(request);
+                TicketResponse response = ticketService.createTicket(request, userId);
 
                 return ResponseEntity.status(HttpStatus.CREATED)
                                 .body(response);

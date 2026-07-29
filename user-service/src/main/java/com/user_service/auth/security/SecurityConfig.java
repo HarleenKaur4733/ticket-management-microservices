@@ -39,7 +39,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/auth/**",
-                                "/users/register")
+                                "/users/**")
                         .permitAll()
 
                         .anyRequest()

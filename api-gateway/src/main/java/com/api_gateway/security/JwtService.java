@@ -1,21 +1,24 @@
 package com.api_gateway.security;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 
+@Service
 public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     private Claims extractAllClaims(String token) {
@@ -42,11 +45,11 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token) {
-
         try {
             extractAllClaims(token);
             return true;
         } catch (Exception ex) {
+            ex.printStackTrace();
             return false;
         }
     }

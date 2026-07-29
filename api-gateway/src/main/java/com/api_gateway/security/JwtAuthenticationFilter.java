@@ -29,6 +29,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             GatewayFilterChain chain) {
 
         String path = exchange.getRequest().getURI().getPath();
+        System.out.println("========== JWT FILTER ==========");
+        System.out.println("Path: " + path);
 
         // Public endpoints - No JWT required
         if (path.startsWith("/api/auth")
@@ -41,14 +43,19 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .getHeaders()
                 .getFirst(HttpHeaders.AUTHORIZATION);
 
+        System.out.println("Authorization Header = " + authHeader);
+
         // Validate Authorization header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
         // Extract JWT
         String token = authHeader.substring(7);
+        System.out.println("Token: " + token);
+        System.out.println("Is Valid: " + jwtService.isTokenValid(token));
 
         // Validate JWT
         if (!jwtService.isTokenValid(token)) {

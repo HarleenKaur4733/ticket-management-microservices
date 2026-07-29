@@ -39,15 +39,14 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketResponse createTicket(CreateTicketRequest request) {
+    public TicketResponse createTicket(CreateTicketRequest request, Long userId) {
 
         Ticket ticket = ticketMapper.toEntity(request);
 
         ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedAt(LocalDateTime.now());
 
-        // TODO: Get from JWT later
-        ticket.setCreatedByUserId(null);
+        ticket.setCreatedByUserId(userId);
 
         // validate assignedToUserId by calling user-service if it exists
         // Validate that assigned user exists

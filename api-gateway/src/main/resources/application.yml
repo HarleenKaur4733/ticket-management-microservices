@@ -35,5 +35,5 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 jwt:
-  secret: your-very-long-secret-key-here
+  secret: your-very-long-secret-key-at-least-32-characters-long
   expiration: 86400000

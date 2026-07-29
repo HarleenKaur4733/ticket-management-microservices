@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,8 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    private Key getSigningKey() {
-
-        return Keys.hmacShaKeyFor(
-                secret.getBytes(StandardCharsets.UTF_8));
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(

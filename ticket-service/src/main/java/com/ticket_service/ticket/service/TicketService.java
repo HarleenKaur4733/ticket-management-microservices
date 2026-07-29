@@ -13,7 +13,7 @@ import com.ticket_service.ticket.entity.Ticket;
 
 public interface TicketService {
 
-    TicketResponse createTicket(CreateTicketRequest request);
+    TicketResponse createTicket(CreateTicketRequest request, Long userId);
 
     TicketResponse getTicket(Long id);
 
