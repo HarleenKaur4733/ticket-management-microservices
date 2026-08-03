@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.ticket_service.client.UserClient;
 import com.ticket_service.client.enums.UserResponse;
 import com.ticket_service.exception.ResourceNotFoundException;
+import com.ticket_service.exception.UnauthorizedException;
 import com.ticket_service.ticket.dto.CreateTicketRequest;
 import com.ticket_service.ticket.dto.TicketDashboardResponse;
 import com.ticket_service.ticket.dto.TicketResponse;
@@ -35,6 +36,20 @@ public class TicketServiceImpl implements TicketService {
 
         if (userId != null) {
             userClient.getUserById(userId);
+        }
+    }
+
+    private void validateTicketAccess(
+            Ticket ticket,
+            Long userId,
+            String role) {
+
+        boolean isOwner = ticket.getCreatedByUserId().equals(userId);
+        boolean isAdmin = "ADMIN".equals(role);
+
+        if (!isOwner && !isAdmin) {
+            throw new UnauthorizedException(
+                    "You are not authorized to perform this action.");
         }
     }
 
@@ -77,38 +92,49 @@ public class TicketServiceImpl implements TicketService {
 
     }
 
-    @CacheEvict(value = "tickets", key = "#id")
     @Override
-    public TicketResponse updateTicket(Long id, UpdateTicketRequest request) {
+    @CacheEvict(value = "tickets", key = "#id")
+    public TicketResponse updateTicket(
+            Long id,
+            UpdateTicketRequest request,
+            Long userId,
+            String role) {
+
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+        validateTicketAccess(ticket, userId, role);
 
         if (request.getPriority() != null) {
             ticket.setPriority(request.getPriority());
         }
+
         if (request.getStatus() != null) {
             ticket.setStatus(request.getStatus());
         }
+
         if (request.getAssignedToUserId() != null) {
 
-            validateAssignedUser(request.getAssignedToUserId());
+            // Validate assigned user exists
+            UserResponse assignedUser = userClient.getUserById(request.getAssignedToUserId());
 
-            ticket.setAssignedToUserId(
-                    request.getAssignedToUserId());
+            ticket.setAssignedToUserId(assignedUser.getId());
         }
 
         Ticket updatedTicket = ticketRepository.save(ticket);
 
         return ticketMapper.toResponse(updatedTicket);
-
     }
 
-    @CacheEvict(value = "tickets", key = "#id")
     @Override
-    public void deleteTicket(Long id) {
-        ticketRepository.findById(id)
+    @CacheEvict(value = "tickets", key = "#id")
+    public void deleteTicket(Long id, Long userId, String role) {
+
+        Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        ticketRepository.deleteById(id);
+
+        validateTicketAccess(ticket, userId, role);
+
+        ticketRepository.delete(ticket);
     }
 
     @Cacheable(value = "ticketEntities", key = "#id")

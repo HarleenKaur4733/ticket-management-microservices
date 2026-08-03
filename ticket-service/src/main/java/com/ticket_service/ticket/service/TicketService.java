@@ -21,9 +21,12 @@ public interface TicketService {
 
     Page<TicketResponse> getAllTickets(Pageable pageable);
 
-    TicketResponse updateTicket(Long id, UpdateTicketRequest request);
+    TicketResponse updateTicket(Long id,
+            UpdateTicketRequest request,
+            Long userId,
+            String role);
 
-    void deleteTicket(Long id);
+    void deleteTicket(Long id, Long userId, String role);
 
     List<TicketDashboardResponse> getDashboardTickets();
 

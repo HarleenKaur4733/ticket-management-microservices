@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import com.ticket_service.ticket.dto.TicketResponse;
 import com.ticket_service.ticket.dto.UpdateTicketRequest;
 import com.ticket_service.ticket.service.TicketService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -57,20 +59,24 @@ public class TicketController {
                                 ticketService.getAllTickets(pageable));
         }
 
-        @PatchMapping("/{id}")
+        @PutMapping("/{id}")
         public ResponseEntity<TicketResponse> updateTicket(
                         @PathVariable Long id,
-                        @RequestBody UpdateTicketRequest request) {
+                        @RequestHeader("X-User-Id") Long userId,
+                        @RequestHeader("X-User-Role") String role,
+                        @Valid @RequestBody UpdateTicketRequest request) {
 
                 return ResponseEntity.ok(
-                                ticketService.updateTicket(id, request));
+                                ticketService.updateTicket(id, request, userId, role));
         }
 
         @DeleteMapping("/{id}")
         public ResponseEntity<Void> deleteTicket(
-                        @PathVariable Long id) {
+                        @PathVariable Long id,
+                        @RequestHeader("X-User-Id") Long userId,
+                        @RequestHeader("X-User-Role") String role) {
 
-                ticketService.deleteTicket(id);
+                ticketService.deleteTicket(id, userId, role);
 
                 return ResponseEntity.noContent().build();
         }
